@@ -17,6 +17,19 @@ Backend:
 - MongoDB
 - Multer
 
+### MinIO Setup
+
+Download MinIO:
+https://min.io/download
+
+Run:
+
+minio server ./storage --console-address ":9001"
+
+Console:
+http://localhost:9001
+
+
 ## Project Status
 
 Backend MVP in progress.
