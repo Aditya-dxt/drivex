@@ -26,6 +26,13 @@ app.use(express.json());
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "DriveX API is running 🚀",
+    status: "healthy",
+  });
+});
+
 connectDB();
 
 const limiter = rateLimit({
