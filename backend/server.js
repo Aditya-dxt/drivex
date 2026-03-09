@@ -47,6 +47,19 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.get("/api", (req, res) => {
+  res.json({
+    routes: [
+      "/api/auth/register",
+      "/api/auth/login",
+      "/api/files",
+      "/api/folders",
+      "/api/storage",
+      "/api/dashboard",
+    ],
+  });
+});
+
 app.use("/api", limiter);
 
 app.use("/api/auth", authRoutes);
