@@ -22,13 +22,54 @@ export const uploadFile = async (req, res) => {
     }
 
     const file = req.file;
+
+    const allowedTypes = [
+      // Images
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/webp",
+
+      // Documents
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+      // Excel
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+      // PowerPoint
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+
+      // Text
+      "text/plain",
+      "text/csv",
+
+      // Archives
+      "application/zip",
+      "application/x-zip-compressed",
+
+      // Videos
+      "video/mp4",
+      "video/mpeg",
+
+      // Audio
+      "audio/mpeg",
+      "audio/mp3",
+    ];
+
+    if (!allowedTypes.includes(file.mimetype)) {
+      return res.status(400).json({
+        message: "File type not allowed",
+      });
+    }
+
     const fileBuffer = file.buffer;
 
     // Generate hash for deduplication
-    const hash = crypto
-      .createHash("sha256")
-      .update(fileBuffer)
-      .digest("hex");
+    const hash = crypto.createHash("sha256").update(fileBuffer).digest("hex");
 
     // Check if file already exists (deduplication)
     const existingHashFile = await File.findOne({ hash });
@@ -73,7 +114,7 @@ export const uploadFile = async (req, res) => {
       file.size,
       {
         "Content-Type": file.mimetype,
-      }
+      },
     );
 
     // Versioning check
@@ -111,7 +152,7 @@ export const uploadFile = async (req, res) => {
       req.user._id,
       savedFile._id,
       "UPLOAD",
-      `Uploaded file ${savedFile.name}`
+      `Uploaded file ${savedFile.name}`,
     );
 
     // Increase storage usage
@@ -120,7 +161,6 @@ export const uploadFile = async (req, res) => {
     });
 
     res.status(201).json(savedFile);
-
   } catch (error) {
     console.error("Upload error:", error);
     res.status(500).json({ error: error.message });
@@ -562,13 +602,12 @@ export const permanentlyDeleteFile = async (req, res) => {
       req.user._id,
       file._id,
       "PERMANENT_DELETE",
-      `Permanently deleted ${file.name}`
+      `Permanently deleted ${file.name}`,
     );
 
     res.json({
       message: "File permanently deleted",
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
