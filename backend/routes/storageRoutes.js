@@ -1,5 +1,5 @@
 import express from "express";
-import { getStorageUsage } from "../controllers/storageController.js";
+import { getStorageStats } from "../controllers/storageController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -18,6 +18,6 @@ const router = express.Router();
  *     summary: Get storage usage
  *     tags: [Storage]
  */
-router.get("/", protect, getStorageUsage);
+router.get("/", protect, getStorageStats);
 
 export default router;
