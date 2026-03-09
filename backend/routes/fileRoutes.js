@@ -28,6 +28,27 @@ import {
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /api/files/upload:
+ *   post:
+ *     summary: Upload a file
+ *     tags: [Files]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: File uploaded successfully
+ */
+
 router.post("/upload", protect, upload.single("file"), uploadFile);
 
 router.get("/", protect, getFiles);

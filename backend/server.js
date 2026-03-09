@@ -49,7 +49,14 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(
+  "/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customSiteTitle: "DriveX Backend API",
+    customCss: ".swagger-ui .topbar { display: none }",
+  })
+);
 
 app.use("/api", limiter);
 
