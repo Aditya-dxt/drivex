@@ -1,7 +1,6 @@
 import File from "../models/File.js";
 import User from "../models/User.js";
-import minioClient from "../config/minio.js";
-import { BUCKET_NAME } from "../config/storage.js";
+import { minioClient, BUCKET_NAME } from "../config/minio.js";
 import { logActivity } from "../utils/activityLogger.js";
 import { nanoid } from "nanoid";
 import fs from "fs";
