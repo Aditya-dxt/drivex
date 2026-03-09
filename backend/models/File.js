@@ -47,6 +47,22 @@ const fileSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    isPublic: {
+      type: Boolean,
+      default: false,
+    },
+
+    publicId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    hash: {
+      type: String,
+      index: true,
+    },
   },
   { timestamps: true },
 );

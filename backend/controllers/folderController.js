@@ -1,4 +1,5 @@
 import Folder from "../models/Folder.js";
+import File from "../models/File.js";
 
 export const createFolder = async (req, res) => {
   try {
@@ -29,6 +30,52 @@ export const getFolders = async (req, res) => {
     res.json(folders);
 
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/*
+==============================
+RECURSIVE FOLDER SIZE
+==============================
+*/
+export const getFolderSize = async (req, res) => {
+  try {
+    const { folderId } = req.params;
+
+    async function calculateSize(folderId) {
+      let totalSize = 0;
+
+      // Files in this folder
+      const files = await File.find({
+        folder: folderId,
+        isTrashed: false
+      });
+
+      for (const file of files) {
+        totalSize += file.size;
+      }
+
+      // Subfolders
+      const subfolders = await Folder.find({
+        parentFolder: folderId
+      });
+
+      for (const sub of subfolders) {
+        totalSize += await calculateSize(sub._id);
+      }
+
+      return totalSize;
+    }
+
+    const folderSize = await calculateSize(folderId);
+
+    res.json({
+      folderSize
+    });
+
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };

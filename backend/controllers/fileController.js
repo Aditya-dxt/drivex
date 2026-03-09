@@ -3,12 +3,17 @@ import User from "../models/User.js";
 import minioClient from "../config/minio.js";
 import { BUCKET_NAME } from "../config/storage.js";
 import { logActivity } from "../utils/activityLogger.js";
+import { nanoid } from "nanoid";
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
 
 /*
 ==============================
 UPLOAD FILE
 ==============================
 */
+
 export const uploadFile = async (req, res) => {
   try {
     const { folder } = req.body;
@@ -18,14 +23,43 @@ export const uploadFile = async (req, res) => {
     }
 
     const file = req.file;
+    const fileBuffer = file.buffer;
+
+    // Generate hash for deduplication
+    const hash = crypto
+      .createHash("sha256")
+      .update(fileBuffer)
+      .digest("hex");
+
+    // Check if file already exists (deduplication)
+    const existingHashFile = await File.findOne({ hash });
+
+    if (existingHashFile) {
+      const newFile = await File.create({
+        name: file.originalname,
+        originalName: file.originalname,
+        version: 1,
+        isLatest: true,
+        size: existingHashFile.size,
+        mimeType: existingHashFile.mimeType,
+        owner: req.user._id,
+        folder: folder || null,
+        storagePath: existingHashFile.storagePath,
+        hash,
+      });
+
+      return res.json({
+        message: "File already exists (deduplicated)",
+        file: newFile,
+      });
+    }
 
     const sanitizedName = file.originalname.replace(/\s+/g, "_");
-
     const objectName = `${Date.now()}-${sanitizedName}`;
 
     const user = await User.findById(req.user._id);
 
-    // ✅ Storage quota check
+    // Storage quota check
     if (user.storageUsed + file.size > user.storageLimit) {
       return res.status(400).json({
         message: "Storage limit exceeded (10GB Free Plan)",
@@ -36,65 +70,58 @@ export const uploadFile = async (req, res) => {
     await minioClient.putObject(
       BUCKET_NAME,
       objectName,
-      file.buffer,
+      fileBuffer,
       file.size,
       {
         "Content-Type": file.mimetype,
-      },
+      }
     );
 
-    // Check for existing file with same name in the same folder to determine versioning
-    const existingFile = await File.findOne({
+    // Versioning check
+    const existingVersionFile = await File.findOne({
       owner: req.user._id,
       originalName: file.originalname,
       folder: folder || null,
     }).sort({ version: -1 });
 
-    // Determine version number
     let version = 1;
 
-    if (existingFile) {
-      version = existingFile.version + 1;
+    if (existingVersionFile) {
+      version = existingVersionFile.version + 1;
 
-      existingFile.isLatest = false;
-      await existingFile.save();
+      existingVersionFile.isLatest = false;
+      await existingVersionFile.save();
     }
 
-    // Save file metadata in MongoDB
+    // Save file metadata
     const savedFile = await File.create({
       name: file.originalname,
-
       originalName: file.originalname,
-
       version,
-
       isLatest: true,
-
       size: file.size,
-
       mimeType: file.mimetype,
-
       owner: req.user._id,
-
       folder: folder || null,
-
       storagePath: objectName,
+      hash,
     });
 
-    //Activity Logging
+    // Activity Logging
     await logActivity(
       req.user._id,
       savedFile._id,
       "UPLOAD",
-      `Uploaded file ${savedFile.name}`,
+      `Uploaded file ${savedFile.name}`
     );
 
-    // ✅ Increase storage usage
+    // Increase storage usage
     await User.findByIdAndUpdate(req.user._id, {
       $inc: { storageUsed: file.size },
     });
 
     res.status(201).json(savedFile);
+
   } catch (error) {
     console.error("Upload error:", error);
     res.status(500).json({ error: error.message });
@@ -193,7 +220,7 @@ export const previewFile = async (req, res) => {
 
 /*
 ==============================
-DELETE FILE
+MOVE FILE TO TRASH
 ==============================
 */
 export const deleteFile = async (req, res) => {
@@ -206,21 +233,19 @@ export const deleteFile = async (req, res) => {
       return res.status(404).json({ message: "File not found" });
     }
 
-    // Delete file from MinIO
-    await minioClient.removeObject(BUCKET_NAME, file.storagePath);
+    if (file.isTrashed) {
+      return res.status(400).json({ message: "File already in trash" });
+    }
 
-    // Soft delete in MongoDB
+    // ❌ DO NOT delete from MinIO
+    // ❌ DO NOT reduce storageUsed
+
     file.isTrashed = true;
     file.trashedAt = new Date();
 
     await file.save();
 
-    // ✅ Reduce storage usage
-    await User.findByIdAndUpdate(req.user._id, {
-      $inc: { storageUsed: -file.size },
-    });
-
-    //Activity Logging
+    // Activity Logging
     await logActivity(
       req.user._id,
       file._id,
@@ -228,7 +253,10 @@ export const deleteFile = async (req, res) => {
       `Moved ${file.name} to trash`,
     );
 
-    res.json({ message: "File moved to trash" });
+    res.json({
+      message: "File moved to trash",
+      file,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
@@ -377,31 +405,34 @@ export const moveFile = async (req, res) => {
 
 /*
 ==============================
-COPY FILE (Bonus)
+COPY FILE
 ==============================
 */
 export const copyFile = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Find original file
     const file = await File.findById(id);
 
     if (!file) {
       return res.status(404).json({ message: "File not found" });
     }
 
+    // Get user
     const user = await User.findById(req.user._id);
 
+    // Check storage quota
     if (user.storageUsed + file.size > user.storageLimit) {
       return res.status(400).json({
         message: "Storage limit exceeded (10GB Free Plan)",
       });
     }
 
+    // Generate new file name (Google Drive style)
     const baseName = file.name.replace(/(\(\d+\))?(\.[^.]+)$/, "");
     const extension = file.name.split(".").pop();
 
-    // find existing copies
     const existingFiles = await File.find({
       owner: req.user._id,
       name: new RegExp(`^${baseName}`),
@@ -417,15 +448,23 @@ export const copyFile = async (req, res) => {
 
     const newName = `${baseName} (${copyIndex}).${extension}`;
 
-    const newObjectName = Date.now() + "-" + newName;
+    // Generate new MinIO object name
+    const newObjectName = `${Date.now()}-${newName}`;
 
-    // Copy object inside MinIO
+    console.log("Source object:", file.storagePath);
+    console.log("New object:", newObjectName);
+
+    // Ensure source object exists in MinIO
+    await minioClient.statObject(BUCKET_NAME, file.storagePath);
+
+    // Copy object in MinIO
     await minioClient.copyObject(
       BUCKET_NAME,
       newObjectName,
       `/${BUCKET_NAME}/${file.storagePath}`,
     );
 
+    // Save metadata in MongoDB
     const newFile = await File.create({
       name: newName,
       size: file.size,
@@ -435,7 +474,7 @@ export const copyFile = async (req, res) => {
       storagePath: newObjectName,
     });
 
-    // ✅ Increase storage usage
+    // Increase storage usage
     await User.findByIdAndUpdate(req.user._id, {
       $inc: { storageUsed: file.size },
     });
@@ -445,7 +484,7 @@ export const copyFile = async (req, res) => {
       file: newFile,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Copy file error:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -485,7 +524,7 @@ export const restoreFile = async (req, res) => {
 PERMANENT DELETE FILE
 ==============================
 */
-export const permanentDeleteFile = async (req, res) => {
+export const permanentlyDeleteFile = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -495,22 +534,42 @@ export const permanentDeleteFile = async (req, res) => {
       return res.status(404).json({ message: "File not found" });
     }
 
-    // Only allow permanent delete if file is in trash
     if (!file.isTrashed) {
       return res.status(400).json({
         message: "File must be in trash before permanent delete",
       });
     }
 
-    // Delete from MinIO
-    await minioClient.removeObject(BUCKET_NAME, file.storagePath);
+    // Check how many files reference the same storage object
+    const referenceCount = await File.countDocuments({
+      storagePath: file.storagePath,
+    });
 
-    // Delete from MongoDB
+    // Delete from MinIO ONLY if this is the last reference
+    if (referenceCount === 1) {
+      await minioClient.removeObject(BUCKET_NAME, file.storagePath);
+    }
+
+    // Reduce storage usage for the user
+    await User.findByIdAndUpdate(file.owner, {
+      $inc: { storageUsed: -file.size },
+    });
+
+    // Remove file metadata
     await File.findByIdAndDelete(id);
+
+    // Activity Logging
+    await logActivity(
+      req.user._id,
+      file._id,
+      "PERMANENT_DELETE",
+      `Permanently deleted ${file.name}`
+    );
 
     res.json({
       message: "File permanently deleted",
     });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
@@ -560,28 +619,256 @@ export const getActivity = async (req, res) => {
 GET FILE VERSIONS
 ==============================
 */
-export const getFileVersions = async (req,res) => {
-
+export const getFileVersions = async (req, res) => {
   try {
-
     const { id } = req.params;
 
     const file = await File.findById(id);
 
     const versions = await File.find({
-
       owner: req.user._id,
       originalName: file.originalName,
-      folder: file.folder
-
+      folder: file.folder,
     }).sort({ version: -1 });
 
     res.json(versions);
-
-  } catch(error) {
-
+  } catch (error) {
     res.status(500).json({ error: error.message });
-
   }
+};
 
+/*
+==============================
+ENABLE PUBLIC SHARE
+==============================
+*/
+export const enablePublicShare = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const file = await File.findById(id);
+
+    if (!file) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    if (!file.isPublic) {
+      file.isPublic = true;
+      file.publicId = nanoid(10);
+      await file.save();
+    }
+
+    const publicUrl = `${req.protocol}://${req.get("host")}/public/${file.publicId}`;
+
+    res.json({
+      message: "Public link generated",
+      publicUrl,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/*
+==============================
+DISABLE PUBLIC SHARE
+==============================
+*/
+export const disablePublicShare = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const file = await File.findById(id);
+
+    if (!file) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    file.isPublic = false;
+    file.publicId = null;
+
+    await file.save();
+
+    res.json({ message: "Public sharing disabled" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/*
+==============================
+PUBLIC FILE ACCESS
+==============================
+*/
+export const getPublicFile = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const file = await File.findOne({ publicId: id, isPublic: true });
+
+    if (!file) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    const stream = await minioClient.getObject(BUCKET_NAME, file.storagePath);
+
+    res.setHeader("Content-Type", file.mimeType);
+    res.setHeader("Content-Disposition", `inline; filename="${file.name}"`);
+
+    stream.pipe(res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/*
+==============================
+GENERATE DOWNLOAD URL
+==============================
+*/
+
+export const getDownloadUrl = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const file = await File.findById(id);
+
+    if (!file) {
+      return res.status(404).json({
+        message: "File not found",
+      });
+    }
+
+    const expiry = 60 * 5; // 5 minutes
+
+    const url = await minioClient.presignedGetObject(
+      BUCKET_NAME,
+      file.storagePath,
+      expiry,
+    );
+
+    res.json({
+      downloadUrl: url,
+      expiresIn: "5 minutes",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+/*
+==============================
+GENERATE PREVIEW URL
+==============================
+*/
+
+export const getPreviewUrl = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const file = await File.findById(id);
+
+    if (!file) {
+      return res.status(404).json({
+        message: "File not found",
+      });
+    }
+
+    const expiry = 60 * 5; // 5 minutes
+
+    const url = await minioClient.presignedGetObject(
+      BUCKET_NAME,
+      file.storagePath,
+      expiry,
+    );
+
+    res.json({
+      previewUrl: url,
+      mimeType: file.mimeType,
+      expiresIn: "5 minutes",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+};
+
+/*
+==============================
+UPLOAD FILE CHUNK
+==============================
+*/
+export const uploadChunk = async (req, res) => {
+  try {
+    const { uploadId, chunkNumber } = req.body;
+
+    const chunkDir = path.join("uploads/chunks", uploadId);
+
+    if (!fs.existsSync(chunkDir)) {
+      fs.mkdirSync(chunkDir, { recursive: true });
+    }
+
+    const chunkPath = path.join(chunkDir, `chunk_${chunkNumber}`);
+
+    fs.writeFileSync(chunkPath, req.file.buffer);
+
+    res.json({
+      message: "Chunk uploaded successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/*
+==============================
+MERGE CHUNKS
+==============================
+*/
+export const completeChunkUpload = async (req, res) => {
+  try {
+    const { uploadId, fileName } = req.body;
+
+    const chunkDir = path.join("uploads/chunks", uploadId);
+
+    const chunks = fs.readdirSync(chunkDir);
+
+    const finalFilePath = path.join("uploads", fileName);
+
+    const writeStream = fs.createWriteStream(finalFilePath);
+
+    for (const chunk of chunks.sort()) {
+      const chunkPath = path.join(chunkDir, chunk);
+
+      const data = fs.readFileSync(chunkPath);
+
+      writeStream.write(data);
+    }
+
+    writeStream.end();
+
+    // Upload to MinIO
+    const objectName = Date.now() + "-" + fileName;
+
+    await minioClient.fPutObject(BUCKET_NAME, objectName, finalFilePath);
+
+    // Cleanup chunks
+    fs.rmSync(chunkDir, { recursive: true });
+
+    res.json({
+      message: "File uploaded successfully",
+      objectName,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
 };

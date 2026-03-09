@@ -14,9 +14,16 @@ import {
   copyFile,
   getTrashFiles,
   restoreFile,
-  permanentDeleteFile,
+  permanentlyDeleteFile,
   getActivity,
   getFileVersions,
+  enablePublicShare,
+  disablePublicShare,
+  getPublicFile,
+  getDownloadUrl,
+  getPreviewUrl,
+  uploadChunk,
+  completeChunkUpload,
 } from "../controllers/fileController.js";
 
 const router = express.Router();
@@ -45,10 +52,24 @@ router.get("/trash", protect, getTrashFiles);
 
 router.patch("/restore/:id", protect, restoreFile);
 
-router.delete("/permanent/:id", protect, permanentDeleteFile);
+router.delete("/permanent/:id", protect, permanentlyDeleteFile);
 
 router.get("/activity", protect, getActivity);
 
 router.get("/versions/:id", protect, getFileVersions);
+
+router.post("/public/:id", protect, enablePublicShare);
+
+router.delete("/public/:id", protect, disablePublicShare);
+
+router.get("/public/:token", getPublicFile);
+
+router.get("/download-url/:id", protect, getDownloadUrl);
+
+router.get("/preview-url/:id", protect, getPreviewUrl);
+
+router.post("/upload-chunk", protect, upload.single("chunk"), uploadChunk);
+
+router.post("/upload-complete", protect, completeChunkUpload);
 
 export default router;
