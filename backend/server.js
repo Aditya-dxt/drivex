@@ -10,6 +10,8 @@ import folderRoutes from "./routes/folderRoutes.js";
 import storageRoutes from "./routes/storageRoutes.js";
 import { getPublicFile } from "./controllers/fileController.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.js";
 
 dotenv.config();
 
@@ -47,18 +49,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.get("/api", (req, res) => {
-  res.json({
-    routes: [
-      "/api/auth/register",
-      "/api/auth/login",
-      "/api/files",
-      "/api/folders",
-      "/api/storage",
-      "/api/dashboard",
-    ],
-  });
-});
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/api", limiter);
 
