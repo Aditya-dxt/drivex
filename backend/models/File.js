@@ -33,6 +33,20 @@ const fileSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+
+    version: {
+      type: Number,
+      default: 1,
+    },
+
+    originalName: {
+      type: String,
+    },
+
+    isLatest: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true },
 );

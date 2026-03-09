@@ -43,13 +43,41 @@ export const uploadFile = async (req, res) => {
       },
     );
 
-    // Save metadata
+    // Check for existing file with same name in the same folder to determine versioning
+    const existingFile = await File.findOne({
+      owner: req.user._id,
+      originalName: file.originalname,
+      folder: folder || null,
+    }).sort({ version: -1 });
+
+    // Determine version number
+    let version = 1;
+
+    if (existingFile) {
+      version = existingFile.version + 1;
+
+      existingFile.isLatest = false;
+      await existingFile.save();
+    }
+
+    // Save file metadata in MongoDB
     const savedFile = await File.create({
       name: file.originalname,
+
+      originalName: file.originalname,
+
+      version,
+
+      isLatest: true,
+
       size: file.size,
+
       mimeType: file.mimetype,
+
       owner: req.user._id,
+
       folder: folder || null,
+
       storagePath: objectName,
     });
 
@@ -512,22 +540,47 @@ export const getTrashFiles = async (req, res) => {
 GET FILE ACTIVITY LOG
 ==============================
 */
-export const getActivity = async (req,res) => {
+export const getActivity = async (req, res) => {
+  try {
+    const activities = await Activity.find({
+      user: req.user._id,
+    })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .populate("file", "name");
+
+    res.json(activities);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/*
+==============================
+GET FILE VERSIONS
+==============================
+*/
+export const getFileVersions = async (req,res) => {
 
   try {
 
-    const activities = await Activity.find({
-      user: req.user._id
-    })
-    .sort({ createdAt: -1 })
-    .limit(50)
-    .populate("file","name");
+    const { id } = req.params;
 
-    res.json(activities);
+    const file = await File.findById(id);
 
-  } catch(error){
+    const versions = await File.find({
 
-    res.status(500).json({error:error.message});
+      owner: req.user._id,
+      originalName: file.originalName,
+      folder: file.folder
+
+    }).sort({ version: -1 });
+
+    res.json(versions);
+
+  } catch(error) {
+
+    res.status(500).json({ error: error.message });
 
   }
 

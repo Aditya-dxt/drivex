@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema(
 
     storageLimit: {
       type: Number,
-      default: 10 * 1024 * 1024 * 1024, // 10GB
+      default: 10737418240, // 10GB
     },
   },
   { timestamps: true },

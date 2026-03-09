@@ -16,6 +16,7 @@ import {
   restoreFile,
   permanentDeleteFile,
   getActivity,
+  getFileVersions,
 } from "../controllers/fileController.js";
 
 const router = express.Router();
@@ -47,5 +48,7 @@ router.patch("/restore/:id", protect, restoreFile);
 router.delete("/permanent/:id", protect, permanentDeleteFile);
 
 router.get("/activity", protect, getActivity);
+
+router.get("/versions/:id", protect, getFileVersions);
 
 export default router;

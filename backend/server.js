@@ -1,3 +1,5 @@
+//minio server data --console-address ":9001"
+
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -5,6 +7,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import fileRoutes from "./routes/fileRoutes.js";
 import folderRoutes from "./routes/folderRoutes.js";
+import storageRoutes from "./routes/storageRoutes.js";
 
 dotenv.config();
 
@@ -18,6 +21,7 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/files", fileRoutes);
 app.use("/api/folders", folderRoutes);
+app.use("/api/storage", storageRoutes);
 
 const PORT = process.env.PORT || 5000;
 
