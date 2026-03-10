@@ -120,26 +120,28 @@ backend
 
 ### db.js
 
-Purpose
+#### Purpose
 Handles MongoDB database connection.
 
-Responsibilities
+#### Responsibilities
+
+```text
 • Connect backend to MongoDB
 • Manage database configuration
 • Ensure database availability
+```
 
 ---
 
 ### minio.js
 
-Purpose
-Purpose
+#### Purpose
 
 
 Configures MinIO object storage.
 
 
-Responsibilities
+#### Responsibilities
 
 ```text
 • Store uploaded files
@@ -151,13 +153,13 @@ Responsibilities
 
 ### multer.js
 
-Purpose
+#### Purpose
 
 
 Handles file upload processing.
 
 
-Responsibilities
+#### Responsibilities
 
 ```text
 • Process multipart file uploads
@@ -169,13 +171,13 @@ Responsibilities
 
 ### authController.js
 
-Purpose
+#### Purpose
 
 
 Handles user authentication.
 
 
-Responsibilities
+#### Responsibilities
 
 ```text
 • User registration
@@ -187,13 +189,13 @@ Responsibilities
 
 ### fileController.js
 
-Purpose
+#### Purpose
 
 
 Manages file operations.
 
 
-Responsibilities
+#### Responsibilities
 
 ```text
 • Upload files
@@ -207,13 +209,13 @@ Responsibilities
 
 ### folderController.js
 
-Purpose
+#### Purpose
 
 
 Handles folder management.
 
 
-Responsibilities
+#### Responsibilities
 
 ```text
 • Create folders
@@ -226,13 +228,13 @@ Responsibilities
 
 ### storageController.js
 
-Purpose
+#### Purpose
 
 
 Provides storage analytics.
 
 
-Responsibilities
+#### Responsibilities
 
 ```text
 • Track user storage usage
@@ -243,13 +245,13 @@ Responsibilities
 
 ### activityLogger.js
 
-Purpose
+#### Purpose
 
 
 Tracks user activity within the system.
 
 
-Responsibilities
+#### Responsibilities
 
 ```text
 • Log uploads
@@ -317,7 +319,7 @@ GET /api/storage
 
 Create `.env` file
 
-
+```text
 PORT=5000
 
 MONGO_URI=your_mongodb_uri
@@ -328,37 +330,37 @@ MINIO_ENDPOINT=your_minio_endpoint
 MINIO_ACCESS_KEY=your_access_key
 MINIO_SECRET_KEY=your_secret_key
 MINIO_BUCKET=drivex
-
+```
 
 ---
 
 # ▶️ Run Backend Locally
 
-Clone repository
+### Clone repository
 
 
 git clone https://github.com/Aditya-dxt/drivex
 
 
-Navigate to backend
+### Navigate to backend
 
 
 cd backend
 
 
-Install dependencies
+### Install dependencies
 
 
 npm install
 
 
-Start development server
+### Start development server
 
 
 npm run dev
 
 
-Server runs at
+### Server runs at
 
 
 http://localhost:5000
@@ -380,7 +382,7 @@ http://localhost:5000
 
 # 👨‍💻 Author
 
-Aditya Dixit
+### Aditya Dixit
 
 GitHub
 
