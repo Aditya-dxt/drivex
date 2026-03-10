@@ -141,11 +141,11 @@ Configures MinIO object storage.
 
 Responsibilities
 
-
+```text
 • Store uploaded files
 • Retrieve file objects
 • Manage storage bucket
-
+```
 
 ---
 
@@ -159,11 +159,11 @@ Handles file upload processing.
 
 Responsibilities
 
-
+```text
 • Process multipart file uploads
 • Validate uploaded files
 • Pass files to storage service
-
+```
 
 ---
 
@@ -177,11 +177,11 @@ Handles user authentication.
 
 Responsibilities
 
-
+```text
 • User registration
 • User login
 • JWT token generation
-
+```
 
 ---
 
@@ -195,13 +195,13 @@ Manages file operations.
 
 Responsibilities
 
-
+```text
 • Upload files
 • Download files
 • Delete files
 • Rename files
 • Share files
-
+```
 
 ---
 
@@ -215,12 +215,12 @@ Handles folder management.
 
 Responsibilities
 
-
+```text
 • Create folders
 • Rename folders
 • Delete folders
 • Manage nested folders
-
+```
 
 ---
 
@@ -234,10 +234,10 @@ Provides storage analytics.
 
 Responsibilities
 
-
+```text
 • Track user storage usage
 • Provide dashboard statistics
-
+```
 
 ---
 
@@ -251,11 +251,11 @@ Tracks user activity within the system.
 
 Responsibilities
 
-
+```text
 • Log uploads
 • Log deletions
 • Log folder operations
-
+```
 
 ---
 
@@ -281,14 +281,14 @@ MongoDB Metadata
 
 # 📦 API Endpoints
 
-Authentication
+## Authentication
 
 
 POST /api/auth/register
 POST /api/auth/login
 
 
-Files
+## Files
 
 
 POST /api/files/upload
@@ -297,7 +297,7 @@ GET /api/files/:id
 DELETE /api/files/:id
 
 
-Folders
+## Folders
 
 
 POST /api/folders
@@ -305,7 +305,7 @@ GET /api/folders
 DELETE /api/folders/:id
 
 
-Storage
+## Storage
 
 
 GET /api/storage
@@ -368,13 +368,13 @@ http://localhost:5000
 
 # 🔮 Future Improvements
 
-
+```text
 • Large File Chunk Upload
 • File Encryption
 • Signed Download URLs
 • AI File Categorization
 • Mobile App Integration
-
+```
 
 ---
 
