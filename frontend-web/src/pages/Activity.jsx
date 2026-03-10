@@ -1,12 +1,12 @@
 import Layout from "../components/layout/Layout"
 
-function Dashboard(){
+function Activity(){
 
 return(
 
 <Layout>
 
-<h1>Dashboard</h1>
+<h1>Activity</h1>
 
 </Layout>
 
@@ -14,4 +14,4 @@ return(
 
 }
 
-export default Dashboard
+export default Activity
