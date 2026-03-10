@@ -42,6 +42,19 @@ const limiter = rateLimit({
   max: 100
 });
 
+app.get("/api", (req, res) => {
+  res.json({
+    routes: [
+      "/api/auth/register",
+      "/api/auth/login",
+      "/api/files",
+      "/api/folders",
+      "/api/storage",
+      "/api/dashboard",
+    ],
+  });
+});
+
 app.get("/health", (req, res) => {
   res.json({
     status: "OK",
