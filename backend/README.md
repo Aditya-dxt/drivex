@@ -1,110 +1,140 @@
-# ☁️ DriveX Backend
-**Cloud Storage Backend API**
+# ☁️ DriveX Backend API
+Cloud Storage Backend for **DriveX**
 
-This module implements the **backend infrastructure for DriveX**, a cloud-based storage platform similar to **Google Drive / Dropbox**.
+DriveX Backend is a scalable API service that powers the DriveX cloud storage platform.  
+It allows users to **securely upload, manage, organize, and retrieve files** similar to modern cloud storage platforms like Google Drive or Dropbox.
 
-The backend handles **authentication, file storage, folder management, storage analytics, and activity tracking**.
-
-It is designed using **Node.js, Express.js, MongoDB, and MinIO Object Storage** to provide scalable and efficient file management.
+The backend is built using **Node.js, Express.js, MongoDB, and MinIO Object Storage** and follows a modular architecture designed for scalability and maintainability.
 
 ---
 
-## 👤 Ownership
+# 👤 Author
 
-Owner: Aditya Dixit  
-Role: Backend Engineer – Cloud Storage & API Development
+Aditya Dixit
 
-Responsibilities of this module include:
+GitHub
 
-- Building scalable backend APIs
-- Managing user authentication
-- Handling file uploads and storage
-- Organizing files and folders
-- Tracking storage usage
-- Maintaining activity logs
+```text
+https://github.com/Aditya-dxt
+```
 
 ---
 
 # 🌐 Live Backend
 
 Base API
+
+```text
 https://drivex-backend-qrfb.onrender.com
+```
 
 Swagger Documentation
-https://drivex-backend-qrfb.onrender.com/docs
 
+```text
+https://drivex-backend-qrfb.onrender.com/docs
+```
 
 ---
 
 # 🧠 Backend System Architecture
+
 ```text
-             [ Web / Mobile Clients ]
-                       │
-                       ▼
-             ┌─────────────────────┐
-             │   Express Backend   │
-             │    Node.js Server   │
-             └──────────┬──────────┘
-                        │
-        ┌───────────────┼────────────────┐
-        ▼               ▼                ▼
-  [ API Routes ]   [ Middleware ]   [ Swagger Docs ]
-        │               │
-        ▼               ▼
-    ┌─────────────────────────┐
-    │       Controllers       │
-    │    Business Logic Layer │
-    └──────────────┬──────────┘
-                   │
-                   ▼
-             [ Services Layer ]
-                   │
-       ┌───────────┴───────────┐
-       ▼                       ▼
-  [ MongoDB ]            [ MinIO Storage ]
- File Metadata             Object Storage
+                ┌──────────────────────────────┐
+                │        Client Apps            │
+                │   Web / Mobile / API Client   │
+                └───────────────┬──────────────┘
+                                │
+                                ▼
+                        ┌────────────────┐
+                        │  Express Server │
+                        │   Node.js API   │
+                        └───────┬────────┘
+                                │
+            ┌───────────────────┼───────────────────┐
+            ▼                   ▼                   ▼
+     ┌─────────────┐    ┌──────────────┐    ┌─────────────┐
+     │   Routes     │    │  Middleware   │    │   Swagger   │
+     │ API Endpoints│    │ JWT Security  │    │ API Docs    │
+     └──────┬──────┘    └──────┬───────┘    └─────────────┘
+            │                  │
+            ▼                  ▼
+      ┌─────────────────────────────┐
+      │         Controllers          │
+      │     Business Logic Layer     │
+      └──────────────┬──────────────┘
+                     │
+                     ▼
+               ┌─────────────┐
+               │  Services    │
+               │ Storage Logic│
+               └──────┬──────┘
+                      │
+          ┌───────────┴───────────┐
+          ▼                       ▼
+   ┌───────────────┐       ┌───────────────┐
+   │    MongoDB     │       │     MinIO      │
+   │ Metadata Store │       │ Object Storage │
+   └───────────────┘       └───────────────┘
 ```
- 
+
 ---
 
-# 📁 Backend Folder Structure
+# 🧩 Backend Responsibilities
+
+The DriveX backend manages all server-side operations.
+
+Core responsibilities include:
+
+```text
+• User Authentication
+• File Upload and Storage
+• File Metadata Management
+• Folder Organization
+• Storage Analytics
+• Activity Tracking
+• API Documentation
+```
+
+---
+
+# 📁 Backend Directory Structure
 
 ```text
 backend
 │
 ├── config
-│ ├── db.js
-│ ├── minio.js
-│ ├── multer.js
-│ └── swagger.js
+│   ├── db.js
+│   ├── minio.js
+│   ├── multer.js
+│   └── swagger.js
 │
 ├── controllers
-│ ├── authController.js
-│ ├── dashboardController.js
-│ ├── fileController.js
-│ ├── folderController.js
-│ └── storageController.js
+│   ├── authController.js
+│   ├── dashboardController.js
+│   ├── fileController.js
+│   ├── folderController.js
+│   └── storageController.js
 │
 ├── middleware
-│ └── authMiddleware.js
+│   └── authMiddleware.js
 │
 ├── models
-│ ├── User.js
-│ ├── File.js
-│ ├── Folder.js
-│ └── Activity.js
+│   ├── User.js
+│   ├── File.js
+│   ├── Folder.js
+│   └── Activity.js
 │
 ├── routes
-│ ├── authRoutes.js
-│ ├── dashboardRoutes.js
-│ ├── fileRoutes.js
-│ ├── folderRoutes.js
-│ └── storageRoutes.js
+│   ├── authRoutes.js
+│   ├── dashboardRoutes.js
+│   ├── fileRoutes.js
+│   ├── folderRoutes.js
+│   └── storageRoutes.js
 │
 ├── services
 │
 ├── utils
-│ └── activityLogger.js
+│   └── activityLogger.js
 │
 ├── uploads
 │
@@ -113,65 +143,71 @@ backend
 
 ---
 
-
----
-
 # 📄 File-by-File Breakdown
 
-### db.js
+## config/db.js
 
-#### Purpose
-Handles MongoDB database connection.
-
-#### Responsibilities
+Purpose
 
 ```text
-• Connect backend to MongoDB
-• Manage database configuration
+Establishes MongoDB database connection.
+```
+
+Responsibilities
+
+```text
+• Initialize MongoDB connection
+• Handle database configuration
 • Ensure database availability
 ```
 
 ---
 
-### minio.js
+## config/minio.js
 
-#### Purpose
-Configures MinIO object storage.
-
-
-#### Responsibilities
+Purpose
 
 ```text
-• Store uploaded files
-• Retrieve file objects
-• Manage storage bucket
+Configures MinIO object storage service.
+```
+
+Responsibilities
+
+```text
+• Connect backend to MinIO
+• Manage storage buckets
+• Upload and retrieve file objects
 ```
 
 ---
 
-### multer.js
+## config/multer.js
 
-#### Purpose
-Handles file upload processing.
+Purpose
 
+```text
+Handles file upload parsing and validation.
+```
 
-#### Responsibilities
+Responsibilities
 
 ```text
 • Process multipart file uploads
-• Validate uploaded files
+• Validate file formats
 • Pass files to storage service
 ```
 
 ---
 
-### authController.js
+## controllers/authController.js
 
-#### Purpose
-Handles user authentication.
+Purpose
 
+```text
+Handles user authentication logic.
+```
 
-#### Responsibilities
+Responsibilities
 
 ```text
 • User registration
@@ -181,31 +217,35 @@ Handles user authentication.
 
 ---
 
-### fileController.js
+## controllers/fileController.js
 
-#### Purpose
+Purpose
+
+```text
 Manages file operations.
+```
 
-
-#### Responsibilities
+Responsibilities
 
 ```text
 • Upload files
 • Download files
-• Delete files
 • Rename files
+• Delete files
 • Share files
 ```
 
 ---
 
-### folderController.js
+## controllers/folderController.js
 
-#### Purpose
+Purpose
+
+```text
 Handles folder management.
+```
 
-
-#### Responsibilities
+Responsibilities
 
 ```text
 • Create folders
@@ -216,88 +256,109 @@ Handles folder management.
 
 ---
 
-### storageController.js
+## controllers/storageController.js
 
-#### Purpose
-Provides storage analytics.
-
-
-#### Responsibilities
+Purpose
 
 ```text
-• Track user storage usage
+Provides storage analytics.
+```
+
+Responsibilities
+
+```text
+• Calculate storage usage
 • Provide dashboard statistics
 ```
 
 ---
 
-### activityLogger.js
+## utils/activityLogger.js
 
-#### Purpose
-Tracks user activity within the system.
-
-
-#### Responsibilities
+Purpose
 
 ```text
-• Log uploads
+Tracks user activity across the system.
+```
+
+Responsibilities
+
+```text
+• Log file uploads
 • Log deletions
 • Log folder operations
 ```
 
 ---
 
-# 🔄 File Upload Flow
+# 🔄 File Upload Workflow
 
 ```text
-User Upload File
-│
-▼
+User Uploads File
+        │
+        ▼
 Multer Middleware
-│
-▼
-FileController
-│
-▼
-MinIO Storage
-│
-▼
-MongoDB Metadata
+        │
+        ▼
+File Controller
+        │
+        ▼
+MinIO Object Storage
+        │
+        ▼
+MongoDB Metadata Storage
 ```
 
 ---
 
 # 📦 API Endpoints
 
-## Authentication
+Authentication
 
-
+```text
 POST /api/auth/register
 POST /api/auth/login
+```
 
+Files
 
-## Files
-
-
+```text
 POST /api/files/upload
 GET /api/files
 GET /api/files/:id
 DELETE /api/files/:id
+```
 
+Folders
 
-## Folders
-
-
+```text
 POST /api/folders
 GET /api/folders
 DELETE /api/folders/:id
+```
 
+Storage
 
-## Storage
-
-
+```text
 GET /api/storage
+```
 
+---
+
+# 📊 Storage Analytics Flow
+
+```text
+User Files
+     │
+     ▼
+MongoDB File Metadata
+     │
+     ▼
+Storage Controller
+     │
+     ▼
+Dashboard API Response
+```
 
 ---
 
@@ -308,7 +369,7 @@ Create `.env` file
 ```text
 PORT=5000
 
-MONGO_URI=your_mongodb_uri
+MONGO_URI=your_mongodb_connection
 
 JWT_SECRET=your_jwt_secret
 
@@ -320,59 +381,65 @@ MINIO_BUCKET=drivex
 
 ---
 
-# ▶️ Run Backend Locally
+# ▶️ Running the Backend Locally
 
-### Clone repository
-
-git clone https://github.com/Aditya-dxt/drivex
-
-
-### Navigate to backend
-
-cd backend
-
-
-### Install dependencies
-
-npm install
-
-
-### Start development server
-
-npm run dev
-
-
-### Server runs at
-
-http://localhost:5000
-
-
----
-
-# 🔮 Future Improvements
+Clone repository
 
 ```text
-• Large File Chunk Upload
-• File Encryption
-• Signed Download URLs
-• AI File Categorization
-• Mobile App Integration
+git clone https://github.com/Aditya-dxt/drivex
+```
+
+Navigate to backend directory
+
+```text
+cd backend
+```
+
+Install dependencies
+
+```text
+npm install
+```
+
+Start development server
+
+```text
+npm run dev
+```
+
+Server runs at
+
+```text
+http://localhost:5000
 ```
 
 ---
 
-# 👨‍💻 Author
+# 🔮 Recommended Improvements
 
-### Aditya Dixit
+Based on the current architecture, the following improvements can further enhance the backend.
 
-GitHub
+```text
+• Add Redis caching for faster file metadata access
+• Add background jobs for file processing
+• Implement role-based access control (RBAC)
+• Add monitoring with Prometheus or Grafana
+```
 
+---
 
-https://github.com/Aditya-dxt
+# 📈 Future Roadmap
 
+```text
+• React Frontend Dashboard
+• Mobile App (Android)
+• Public File Sharing Links
+• AI-based File Categorization
+• Real-time storage analytics
+```
 
 ---
 
 # ⭐ Support
 
-If you like this project, consider giving it a **GitHub star**.
+If you found this project useful, consider giving it a **GitHub star**.
