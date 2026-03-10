@@ -329,10 +329,7 @@ DriveX will continue evolving with additional features.
 Based on the current architecture, the following improvements can enhance the platform.
 
 ```text
-• Implement chunk uploads for large files
-• Add signed URLs for secure file downloads
 • Add Redis caching for performance
-• Implement API rate limiting
 • Add background job processing
 • Add role-based access control
 • Integrate monitoring tools
