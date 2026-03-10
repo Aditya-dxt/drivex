@@ -40,40 +40,40 @@ https://drivex-backend-qrfb.onrender.com/docs
 
 ```text
                 ┌──────────────────────────────┐
-                │        Client Apps            │
-                │   Web / Mobile / API Client   │
+                │        Client Apps           │
+                │   Web / Mobile / API Client  │
                 └───────────────┬──────────────┘
                                 │
                                 ▼
                         ┌────────────────┐
-                        │  Express Server │
-                        │   Node.js API   │
+                        │  Express Server│
+                        │   Node.js API  │
                         └───────┬────────┘
                                 │
             ┌───────────────────┼───────────────────┐
             ▼                   ▼                   ▼
      ┌─────────────┐    ┌──────────────┐    ┌─────────────┐
-     │   Routes     │    │  Middleware   │    │   Swagger   │
-     │ API Endpoints│    │ JWT Security  │    │ API Docs    │
+     │   Routes    │    │  Middleware  │    │   Swagger   │
+     │API Endpoints│    │ JWT Security │    │ API Docs    │
      └──────┬──────┘    └──────┬───────┘    └─────────────┘
             │                  │
             ▼                  ▼
       ┌─────────────────────────────┐
-      │         Controllers          │
-      │     Business Logic Layer     │
+      │         Controllers         │
+      │     Business Logic Layer    │
       └──────────────┬──────────────┘
                      │
                      ▼
                ┌─────────────┐
-               │  Services    │
-               │ Storage Logic│
+               │  Services   │
+               │Storage Logic│
                └──────┬──────┘
                       │
           ┌───────────┴───────────┐
           ▼                       ▼
    ┌───────────────┐       ┌───────────────┐
-   │    MongoDB     │       │     MinIO      │
-   │ Metadata Store │       │ Object Storage │
+   │    MongoDB    │       │     MinIO     │
+   │ Metadata Stor │       │ Object Storage│
    └───────────────┘       └───────────────┘
 ```
 
