@@ -136,8 +136,6 @@ Handles MongoDB database connection.
 ### minio.js
 
 #### Purpose
-
-
 Configures MinIO object storage.
 
 
@@ -154,8 +152,6 @@ Configures MinIO object storage.
 ### multer.js
 
 #### Purpose
-
-
 Handles file upload processing.
 
 
@@ -172,8 +168,6 @@ Handles file upload processing.
 ### authController.js
 
 #### Purpose
-
-
 Handles user authentication.
 
 
@@ -190,8 +184,6 @@ Handles user authentication.
 ### fileController.js
 
 #### Purpose
-
-
 Manages file operations.
 
 
@@ -210,8 +202,6 @@ Manages file operations.
 ### folderController.js
 
 #### Purpose
-
-
 Handles folder management.
 
 
@@ -229,8 +219,6 @@ Handles folder management.
 ### storageController.js
 
 #### Purpose
-
-
 Provides storage analytics.
 
 
@@ -246,8 +234,6 @@ Provides storage analytics.
 ### activityLogger.js
 
 #### Purpose
-
-
 Tracks user activity within the system.
 
 
@@ -338,30 +324,25 @@ MINIO_BUCKET=drivex
 
 ### Clone repository
 
-
 git clone https://github.com/Aditya-dxt/drivex
 
 
 ### Navigate to backend
-
 
 cd backend
 
 
 ### Install dependencies
 
-
 npm install
 
 
 ### Start development server
 
-
 npm run dev
 
 
 ### Server runs at
-
 
 http://localhost:5000
 
