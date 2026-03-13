@@ -1,11 +1,11 @@
 import Layout from "../components/layout/Layout";
 
-function Dashboard() {
+function Trash() {
   return (
     <Layout>
-      <h1>Dashboard</h1>
+      <h1>Trash</h1>
     </Layout>
   );
 }
 
-export default Dashboard;
+export default Trash;

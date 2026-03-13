@@ -1,16 +1,13 @@
 import Sidebar from "./Sidebar";
-import Topbar from "./Topbar";
-import "../../styles/layout.css"
-import "../../styles/sidebar.css"
-import "../../styles/files.css"
+import Navbar from "./Navbar";
 
-function Layout({ children, refresh }) {
+function Layout({ children }) {
   return (
     <div className="layout">
       <Sidebar />
 
       <div className="main">
-        <Topbar refresh={refresh} />
+        <Navbar />
 
         <div className="content">{children}</div>
       </div>
