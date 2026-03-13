@@ -11,6 +11,7 @@ import fileRoutes from "./routes/fileRoutes.js";
 import folderRoutes from "./routes/folderRoutes.js";
 import storageRoutes from "./routes/storageRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import driveRoutes from "./routes/driveRoutes.js";
 
 import { getPublicFile } from "./controllers/fileController.js";
 
@@ -113,7 +114,7 @@ app.use("/api/files", fileRoutes);
 app.use("/api/folders", folderRoutes);
 app.use("/api/storage", storageRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-
+app.use("/api/drive", driveRoutes);
 app.get("/public/:id", getPublicFile);
 
 /* =========================
