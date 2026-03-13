@@ -2,7 +2,8 @@ import express from "express";
 import {
   createFolder,
   getFolders,
-  getFolderSize
+  getFolderSize,
+  getFolderById
 } from "../controllers/folderController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
