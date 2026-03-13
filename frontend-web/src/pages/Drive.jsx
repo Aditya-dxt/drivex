@@ -1,55 +1,121 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
 import Layout from "../components/layout/Layout";
 import UploadButton from "../components/drive/UploadButton";
 import FileGrid from "../components/drive/FileGrid";
-import { getFiles } from "../api/filesApi";
-import { createFolder, getFolders } from "../api/foldersApi";
 import Breadcrumbs from "../components/drive/Breadcrumbs";
 
+import { getFiles } from "../api/filesApi";
+import { getFolders, createFolder, getFolderById } from "../api/foldersApi";
+
 function Drive() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const folderId = searchParams.get("folder");
+  const currentFolder = folderId || null;
+  const [breadcrumbPath, setBreadcrumbPath] = useState([]);
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState([]);
   const [folderName, setFolderName] = useState("");
-  const [currentFolder, setCurrentFolder] = useState(null);
-  const [path, setPath] = useState([{ id: null, name: "My Drive" }]);
+
+  const [currentFolderObj, setCurrentFolderObj] = useState(null);
+
+  useEffect(() => {
+  const buildBreadcrumb = async () => {
+    if (!folderId) {
+      setBreadcrumbPath([{ id: null, name: "My Drive" }]);
+      return;
+    }
+
+    let chain = [];
+    let currentId = folderId;
+
+    while (currentId) {
+      const folder = await getFolderById(currentId);
+      chain.unshift({
+        id: folder._id,
+        name: folder.name
+      });
+
+      currentId = folder.parentFolder;
+    }
+
+    setBreadcrumbPath([
+      { id: null, name: "My Drive" },
+      ...chain
+    ]);
+  };
+
+  buildBreadcrumb();
+}, [folderId]);
+
 
   /*
   ==============================
-  FETCH DRIVE DATA
+  FETCH CURRENT FOLDER META
   ==============================
   */
 
-  const fetchDrive = async (folderId = null) => {
+  useEffect(() => {
+  const loadFolderMeta = async () => {
+    if (!folderId) {
+      setCurrentFolderObj(null);
+      return;
+    }
+
     try {
-      console.log("Fetching drive for folder:", folderId);
-
-      const foldersData = await getFolders(folderId);
-      console.log("Folders:", foldersData);
-
-      setFolders(foldersData);
-
-      const filesData = await getFiles(folderId);
-      console.log("Files:", filesData);
-
-      setFiles(filesData);
-
-      setCurrentFolder(folderId);
+      const data = await getFolderById(folderId);
+      setCurrentFolderObj(data);
     } catch (error) {
-      console.error("Fetch drive failed:", error);
+      console.error("Failed to fetch folder info:", error);
     }
   };
 
-  useEffect(() => {
-    const loadDrive = async () => {
-      await fetchDrive();
-    };
-
-    loadDrive();
-  }, []);
+  loadFolderMeta();
+}, [folderId]);
 
   /*
   ==============================
-  FILE UPLOAD HANDLER
+  LOAD DRIVE DATA
+  ==============================
+  */
+
+  useEffect(() => {
+    const loadDrive = async () => {
+      try {
+        console.log("Fetching drive for folder:", currentFolder);
+
+        const foldersData = await getFolders(currentFolder);
+        const filesData = await getFiles(currentFolder);
+
+        setFolders(foldersData);
+        setFiles(filesData);
+      } catch (error) {
+        console.error("Drive fetch failed:", error);
+      }
+    };
+
+    loadDrive();
+  }, [currentFolder]);
+
+  /*
+  ==============================
+  BREADCRUMB PATH
+  ==============================
+  */
+
+  const path = currentFolderObj
+    ? [
+        { id: null, name: "My Drive" },
+        { id: currentFolderObj._id, name: currentFolderObj.name }
+      ]
+    : [{ id: null, name: "My Drive" }];
+
+  /*
+  ==============================
+  FILE UPLOAD
   ==============================
   */
 
@@ -71,7 +137,8 @@ function Drive() {
 
       setFolderName("");
 
-      fetchDrive(currentFolder);
+      const updatedFolders = await getFolders(currentFolder);
+      setFolders(updatedFolders);
     } catch (error) {
       console.error("Create folder failed:", error);
     }
@@ -84,27 +151,32 @@ function Drive() {
   */
 
   const openFolder = (folder) => {
-    setPath((prev) => [...prev, { id: folder._id, name: folder.name }]);
-    fetchDrive(folder._id);
+    navigate(`/drive?folder=${folder._id}`);
   };
 
-  const navigateTo = (folderId) => {
-    const index = path.findIndex((p) => p.id === folderId);
+  /*
+  ==============================
+  BREADCRUMB NAVIGATION
+  ==============================
+  */
 
-    const newPath = path.slice(0, index + 1);
-
-    setPath(newPath);
-
-    fetchDrive(folderId);
+  const navigateTo = (id) => {
+    if (!id) {
+      navigate("/drive");
+    } else {
+      navigate(`/drive?folder=${id}`);
+    }
   };
 
   return (
     <Layout>
       <h1>{path[path.length - 1].name}</h1>
-      <Breadcrumbs path={path} onNavigate={navigateTo} />
+
+      <Breadcrumbs path={breadcrumbPath} onNavigate={navigateTo} />
+
       <UploadButton onUpload={handleUpload} />
 
-      {/* Create Folder */}
+      {/* CREATE FOLDER */}
       <div style={{ marginBottom: "20px" }}>
         <input
           placeholder="Folder name"
@@ -115,7 +187,7 @@ function Drive() {
         <button onClick={handleCreateFolder}>Create Folder</button>
       </div>
 
-      {/* Folder Grid */}
+      {/* FOLDER GRID */}
       <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
         {folders.map((folder) => (
           <div
@@ -127,7 +199,7 @@ function Drive() {
               borderRadius: "10px",
               background: "#f5f5f5",
               textAlign: "center",
-              cursor: "pointer",
+              cursor: "pointer"
             }}
           >
             <div style={{ fontSize: "40px" }}>📁</div>
@@ -136,9 +208,11 @@ function Drive() {
         ))}
       </div>
 
-      {/* Files */}
+      {/* EMPTY STATE */}
       {folders.length === 0 && files.length === 0 && (
-        <p style={{ marginTop: "20px", color: "#777" }}>This folder is empty</p>
+        <p style={{ marginTop: "20px", color: "#777" }}>
+          This folder is empty
+        </p>
       )}
 
       <FileGrid files={files} />

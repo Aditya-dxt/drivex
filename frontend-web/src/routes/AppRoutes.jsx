@@ -10,11 +10,19 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
+
         <Route path="/" element={<Drive />} />
+
+        <Route path="/drive" element={<Drive />} />
+
         <Route path="/dashboard" element={<Dashboard />} />
+
         <Route path="/trash" element={<Trash />} />
+
         <Route path="/login" element={<Login />} />
+
         <Route path="/register" element={<Register />} />
+
       </Routes>
     </BrowserRouter>
   );

@@ -16,3 +16,8 @@ export const getFolders = async (parentFolder = null) => {
 
   return res.data;
 };
+
+export const getFolderById = async (id) => {
+  const res = await api.get(`/folders/${id}`);
+  return res.data;
+};

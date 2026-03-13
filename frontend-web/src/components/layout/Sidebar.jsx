@@ -1,15 +1,41 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import FolderTree from "../drive/FolderTree";
 
 function Sidebar() {
-  return (
-    <div className="sidebar">
-      <h2>DriveX</h2>
+  const navigate = useNavigate();
 
-      <nav>
-        <Link to="/">My Drive</Link>
-        <Link to="/dashboard">Dashboard</Link>
-        <Link to="/trash">Trash</Link>
-      </nav>
+  const handleFolderSelect = (folderId) => {
+    navigate(`/drive?folder=${folderId}`);
+    };
+
+  return (
+          <div
+            style={{
+        width: "240px",
+        padding: "16px",
+        borderRight: "1px solid #e5e5e5",
+        background: "#fafafa",
+        height: "100vh",
+      }}
+    >
+      <h2 style={{ marginBottom: "20px" }}>DriveX</h2>
+
+      <div style={{ marginBottom: "16px", fontWeight: "600" }}>My Drive</div>
+
+      <FolderTree onSelectFolder={handleFolderSelect} />
+
+      <div style={{ marginTop: "30px" }}>
+        <p
+          style={{ cursor: "pointer", marginBottom: "8px" }}
+          onClick={() => navigate("/dashboard")}
+        >
+          Dashboard
+        </p>
+
+        <p style={{ cursor: "pointer" }} onClick={() => navigate("/trash")}>
+          Trash
+        </p>
+        </div>
     </div>
   );
 }
