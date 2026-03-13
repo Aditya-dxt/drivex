@@ -88,3 +88,17 @@ export const getFolderSize = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getFolderById = async (req, res) => {
+  try {
+    const folder = await Folder.findById(req.params.id);
+
+    if (!folder) {
+      return res.status(404).json({ message: "Folder not found" });
+    }
+
+    res.json(folder);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};

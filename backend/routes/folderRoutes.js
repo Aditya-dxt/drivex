@@ -42,4 +42,13 @@ router.get("/", protect, getFolders);
  */
 router.get("/size/:folderId", protect, getFolderSize);
 
+/**
+ * @swagger
+ * /api/folders/{folderId}:
+ *   get:
+ *     summary: Get folder by ID
+ *     tags: [Folders]
+ */
+router.get("/:id", protect, getFolderById);
+
 export default router;
