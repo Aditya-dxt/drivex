@@ -22,10 +22,19 @@ export const createFolder = async (req, res) => {
 
 export const getFolders = async (req, res) => {
   try {
+    const { parentFolder } = req.query;
 
-    const folders = await Folder.find({
-      owner: req.user._id
-    });
+    const query = {
+      owner: req.user._id,
+    };
+
+    if (parentFolder) {
+      query.parentFolder = parentFolder;
+    } else {
+      query.parentFolder = null;
+    }
+
+    const folders = await Folder.find(query).sort({ createdAt: -1 });
 
     res.json(folders);
 
