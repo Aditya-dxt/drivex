@@ -52,4 +52,22 @@ router.get("/size/:folderId", protect, getFolderSize);
  */
 router.get("/:id", protect, getFolderById);
 
+/**
+ * @swagger
+ * /api/folders/{folderId}:
+ *   patch:
+ *     summary: Rename a folder
+ *     tags: [Folders]
+ */
+router.patch("/:id", protect, renameFolder);
+
+/**
+ * @swagger
+ * /api/folders/{folderId}:
+ *   delete:
+ *     summary: Delete a folder and its contents
+ *     tags: [Folders]
+ */
+router.delete("/:id", protect, deleteFolder);
+
 export default router;
