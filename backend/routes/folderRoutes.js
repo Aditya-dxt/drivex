@@ -3,7 +3,9 @@ import {
   createFolder,
   getFolders,
   getFolderSize,
-  getFolderById
+  getFolderById,
+  renameFolder,
+  deleteFolder,
 } from "../controllers/folderController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
