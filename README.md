@@ -1,342 +1,275 @@
-# ☁️ DriveX
-Cloud Storage Platform
+<div align="center">
 
-DriveX is a **modern cloud-based file storage system** that allows users to securely upload, organize, manage, and retrieve files.
+# ☁️ DriveX — Cloud Storage Platform
 
-The platform is inspired by systems such as **Google Drive, Dropbox, and OneDrive**, and is designed with scalable backend architecture using **Node.js, MongoDB, and MinIO Object Storage**.
+**A modern, scalable cloud file storage system**  
+inspired by Google Drive and Dropbox, built with Node.js · MongoDB · MinIO
 
-DriveX focuses on providing a modular architecture that supports **secure authentication, efficient storage management, and scalable API design**.
+[![Backend API](https://img.shields.io/badge/🔗%20Backend%20API-Live-brightgreen?style=for-the-badge)](https://drivex-backend-qrfb.onrender.com)
+[![Swagger Docs](https://img.shields.io/badge/📘%20Swagger%20Docs-Live-orange?style=for-the-badge)](https://drivex-backend-qrfb.onrender.com/docs)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com/)
+[![MinIO](https://img.shields.io/badge/MinIO-C72E49?style=for-the-badge&logo=minio&logoColor=white)](https://min.io/)
+[![License](https://img.shields.io/github/license/Aditya-dxt/drivex?style=for-the-badge)](LICENSE)
 
----
-
-# 👤 Author
-
-Aditya Dixit
-
-GitHub
-
-```text
-https://github.com/Aditya-dxt
-```
+</div>
 
 ---
 
-# 🌐 Live Backend
+## 🌐 Live Links
 
-Backend API
+| Service | URL |
+|---|---|
+| 🔗 Backend REST API | https://drivex-backend-qrfb.onrender.com |
+| 📘 Swagger API Docs | https://drivex-backend-qrfb.onrender.com/docs |
 
-```text
-https://drivex-backend-qrfb.onrender.com
-```
-
-Swagger API Documentation
-
-```text
-https://drivex-backend-qrfb.onrender.com/docs
-```
+> **Note:** First load may take ~30 seconds (Render free tier cold start).
 
 ---
 
-# 🧠 Complete System Architecture
+## 🧩 What Is DriveX?
 
-```text
-                     ┌────────────────────────────┐
-                     │        Client Apps         │
-                     │   Web / Mobile / Desktop   │
-                     └─────────────┬──────────────┘
-                                   │
-                                   ▼
-                        ┌─────────────────────┐
-                        │      DriveX API     │
-                        │    Node.js Backend  │
-                        └───────────┬─────────┘
-                                    │
-         ┌──────────────────────────┼─────────────────────────┐
-         ▼                          ▼                         ▼
- ┌──────────────┐          ┌────────────────┐         ┌────────────────┐
- │Authentication│          │ File Management│         │ Folder Manager │
- │ JWT Security │          │ Upload / Delete│         │ Organize Files │
- └──────┬───────┘          └───────┬────────┘         └───────┬────────┘
-        │                          │                          │
-        ▼                          ▼                          ▼
-                ┌────────────────────────────────┐
-                │          Service Layer         │
-                │ Business Logic & Storage Logic │
-                └───────────────┬────────────────┘
-                                │
-                 ┌──────────────┴───────────────┐
-                 ▼                              ▼
-          ┌───────────────┐             ┌────────────────┐
-          │    MongoDB    │             │      MinIO     │
-          │ Metadata Store│             │ Object Storage │
-          └───────────────┘             └────────────────┘
-```
+DriveX is a **production-grade cloud file storage backend** that lets users securely upload, organize, manage, and retrieve files — with a clean REST API, JWT authentication, MinIO object storage, and a nested folder system.
 
 ---
 
-# ⚙️ Technology Stack
-
-Backend
-
-```text
-Node.js
-Express.js
+## 🏗️ System Architecture
 ```
+            ┌───────────────────────────┐
+            │        Client Apps        │
+            │   Web / Mobile / Desktop  │
+            └────────────┬──────────────┘
+                         │
+                         ▼
+              ┌─────────────────────┐
+              │     DriveX API      │
+              │   Node.js Backend   │
+              └──────────┬──────────┘
+                         │
+     ┌───────────────────┼────────────────────┐
+     ▼                   ▼                    ▼
+     ┌─────────────┐   ┌────────────────┐   ┌───────────────┐
+     │    Auth     │   │File Management │   │Folder Manager │
+     │ JWT Security│   │Upload / Delete │   │Nested Structure│
 
-Database
+└──────┬──────┘   └───────┬────────┘   └───────┬───────┘
 
-```text
-MongoDB (Mongoose ODM)
-```
+│                  │                    │
 
-Object Storage
+└──────────────────┼────────────────────┘
 
-```text
-MinIO (S3 Compatible Storage)
-```
+▼
 
-Authentication
+┌─────────────────────────┐
 
-```text
-JWT Authentication
-```
+│       Service Layer      │
 
-API Documentation
+│  Business & Storage Logic│
 
-```text
-Swagger (OpenAPI)
-```
+└────────────┬────────────┘
 
-Deployment
-
-```text
-Render
-```
-
----
-
-# 📁 Repository Structure
-
-```text
-drivex
 │
-├── backend
-│   │
-│   ├── config
-│   ├── controllers
-│   ├── middleware
-│   ├── models
-│   ├── routes
-│   ├── services
-│   ├── utils
-│   └── uploads
-│
-├── frontend (coming soon)
-│
+
+┌─────────────┴─────────────┐
+
+▼                           ▼
+
+┌─────────────┐           ┌────────────────┐
+
+│   MongoDB   │           │     MinIO      │
+
+│  Metadata   │           │ Object Storage │
+
+└─────────────┘           └────────────────┘
+```
+
+---
+
+## ✨ Features
+
+### 🔐 Authentication
+- User registration & login
+- JWT-based authentication
+- Protected API routes via middleware
+
+### 📁 File Management
+- Upload, download, delete & rename files
+- File preview support
+- Multer middleware for multipart upload handling
+- Files stored in **MinIO** (S3-compatible object storage)
+- Metadata stored in **MongoDB**
+
+### 🗂️ Folder Management
+- Create and delete folders
+- Nested folder structure support
+- Organize files across folder hierarchy
+
+### 📊 Storage Analytics
+- Real-time storage usage tracking
+- File & folder count per user
+- Upload and delete activity history
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Runtime** | Node.js |
+| **Framework** | Express.js |
+| **Database** | MongoDB (Mongoose ODM) |
+| **Object Storage** | MinIO (S3-compatible) |
+| **Authentication** | JWT (JSON Web Tokens) |
+| **File Upload** | Multer middleware |
+| **API Docs** | Swagger / OpenAPI |
+| **Deployment** | Render |
+
+---
+
+## 📡 API Reference
+
+### Auth
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login + receive JWT |
+
+### Files
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/files/upload` | Upload a file |
+| GET | `/api/files` | List all user files |
+| GET | `/api/files/:id` | Get file by ID |
+| DELETE | `/api/files/:id` | Delete a file |
+
+### Folders
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/folders` | Create a folder |
+| GET | `/api/folders` | List all folders |
+| DELETE | `/api/folders/:id` | Delete a folder |
+
+### Storage
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/storage` | Get usage analytics |
+
+📘 Full interactive docs: [Swagger UI →](https://drivex-backend-qrfb.onrender.com/docs)
+
+---
+
+## 🔄 File Upload Pipeline
+```
+                    User Selects File
+
+                             │
+
+                             ▼
+
+                      Express Route
+
+                             │
+
+                             ▼
+
+                Auth Middleware (JWT check)
+
+                             │
+
+                             ▼
+
+                   Multer Upload Handler
+
+                             │
+
+                             ▼
+
+     MinIO Object Storage  ←── stores the actual file
+
+                             │
+
+                             ▼
+
+MongoDB Metadata      ←── stores filename, size, owner, path
+
+                             │
+
+                             ▼
+
+                       API Response
+```
+
+---
+
+## 📂 Project Structure
+```
+drivex/
+
+├── backend/
+
+│   ├── config/         # DB & MinIO connection
+
+│   ├── controllers/    # Route handlers
+
+│   ├── middleware/     # Auth guard, error handler
+
+│   ├── models/         # Mongoose schemas
+
+│   ├── routes/         # API route definitions
+
+│   ├── services/       # Business logic
+
+│   ├── utils/          # Helper functions
+
+│   └── uploads/        # Temp upload directory
+
+├── frontend-web/       # Frontend (in progress)
+
 └── README.md
+
+```
+---
+
+## 🚀 Getting Started
+
+```bash
+# Clone
+git clone https://github.com/Aditya-dxt/drivex.git
+cd drivex/backend
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Fill in: MONGO_URI, JWT_SECRET, MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY
+
+# Run
+npm run dev        # → http://localhost:5000
 ```
 
 ---
 
-# 📦 Core Platform Features
+## 🔮 Roadmap
 
-Authentication System
-
-```text
-• User Registration
-• User Login
-• JWT Authentication
-• Secure API Access
-```
-
-File Management
-
-```text
-• Upload Files
-• Download Files
-• Delete Files
-• Rename Files
-• File Preview
-```
-
-Folder Management
-
-```text
-• Create Folders
-• Nested Folder Structure
-• Organize Files
-```
-
-Storage Analytics
-
-```text
-• Storage Usage Tracking
-• File Count
-• Folder Count
-```
-
-Activity Tracking
-
-```text
-• Upload History
-• Delete History
-• Folder Activity
-```
+- [ ] React frontend dashboard
+- [ ] File sharing via public/private links
+- [ ] Chunked upload for large files (>100MB)
+- [ ] AI-powered file organisation & tagging
+- [ ] File encryption at rest
+- [ ] Multi-device sync
+- [ ] Redis caching for metadata
+- [ ] Role-based access control (admin / viewer / editor)
+- [ ] Android mobile app
 
 ---
 
-# 🔄 File Storage Pipeline
+## 📄 License
 
-```text
-User Upload File
-        │
-        ▼
-Frontend Application
-        │
-        ▼
-DriveX Backend API
-        │
-        ▼
-Multer Upload Middleware
-        │
-        ▼
-MinIO Object Storage
-        │
-        ▼
-MongoDB Metadata Storage
-```
+MIT — open source and free to use.
 
 ---
 
-# 🔐 Authentication Flow
-
-```text
-User Login
-     │
-     ▼
-Auth Controller
-     │
-     ▼
-Verify Credentials
-     │
-     ▼
-Generate JWT Token
-     │
-     ▼
-Protected API Access
-```
-
----
-
-# 📊 Storage Analytics Pipeline
-
-```text
-User Files
-     │
-     ▼
-MongoDB Metadata
-     │
-     ▼
-Storage Controller
-     │
-     ▼
-Dashboard API
-     │
-     ▼
-Frontend Analytics
-```
-
----
-
-# 📡 API Architecture
-
-```text
-Client Request
-      │
-      ▼
-Express Route
-      │
-      ▼
-Authentication Middleware
-      │
-      ▼
-Controller
-      │
-      ▼
-Service Layer
-      │
-      ▼
-Database / Storage
-      │
-      ▼
-API Response
-```
-
----
-
-# 📦 Example API Endpoints
-
-Authentication
-
-```text
-POST /api/auth/register
-POST /api/auth/login
-```
-
-Files
-
-```text
-POST /api/files/upload
-GET /api/files
-GET /api/files/:id
-DELETE /api/files/:id
-```
-
-Folders
-
-```text
-POST /api/folders
-GET /api/folders
-DELETE /api/folders/:id
-```
-
-Storage
-
-```text
-GET /api/storage
-```
-
----
-
-# 📱 Future Roadmap
-
-DriveX will continue evolving with additional features.
-
-```text
-• React Frontend Dashboard
-• Android Mobile Application
-• File Sharing Links
-• Chunk Upload for Large Files
-• AI File Organization
-• File Encryption
-• Multi-device Sync
-```
-
----
-
-# 🚀 Recommended Improvements
-
-Based on the current architecture, the following improvements can enhance the platform.
-
-```text
-• Add Redis caching for performance
-• Add background job processing
-• Add role-based access control
-• Integrate monitoring tools
-```
-
----
-
-# ⭐ Support
-
-If you found this project helpful, consider giving it a **star on GitHub**.
+<div align="center">
+  Built by <a href="https://github.com/Aditya-dxt">Aditya Dixit</a>
+</div>
